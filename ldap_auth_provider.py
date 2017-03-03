@@ -173,8 +173,15 @@ class LdapAuthProvider(object):
                     ]
                 )
 
-                if len(conn.response) == 1:
-                    attrs = conn.response[0]['attributes']
+                responses = [
+                    response
+                    for response
+                    in conn.response
+                    if response['type'] == 'searchResEntry'
+                ]
+
+                if len(responses) == 1:
+                    attrs = responses[0]['attributes']
                     name = attrs[self.ldap_attributes['name']][0]
                     try:
                         mail = attrs[self.ldap_attributes['mail']][0]
@@ -197,12 +204,12 @@ class LdapAuthProvider(object):
 
                     defer.returnValue(True)
                 else:
-                    if len(conn.response) == 0:
+                    if len(responses) == 0:
                         logger.warning("LDAP registration failed, no result.")
                     else:
                         logger.warning(
                             "LDAP registration failed, too many results (%s)",
-                            len(conn.response)
+                            len(responses)
                         )
 
                     defer.returnValue(False)
