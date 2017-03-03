@@ -360,7 +360,7 @@ class LdapAuthProvider(object):
                 defer.returnValue((False, None))
 
             # construct search_filter like (uid=localpart)
-            query = "({prop}={value})".format(
+            query = "({prop}={value}@metoda.com)".format(
                 prop=self.ldap_attributes['uid'],
                 value=localpart
             )
