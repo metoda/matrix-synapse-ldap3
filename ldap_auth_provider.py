@@ -379,10 +379,16 @@ class LdapAuthProvider(object):
                 search_base=self.ldap_base,
                 search_filter=query
             )
+            responses = [
+                response
+                for response
+                in conn.response
+                if response['type'] == 'searchResEntry'
+            ]
 
-            if len(conn.response) == 1:
+            if len(responses) == 1:
                 # GOOD: found exactly one result
-                user_dn = conn.response[0]['dn']
+                user_dn = responses[0]['dn']
                 logger.debug('LDAP search found dn: %s', user_dn)
 
                 # unbind and simple bind with user_dn to verify the password
@@ -396,7 +402,7 @@ class LdapAuthProvider(object):
                 defer.returnValue(result)
             else:
                 # BAD: found 0 or > 1 results, abort!
-                if len(conn.response) == 0:
+                if len(responses) == 0:
                     logger.info(
                         "LDAP search returned no results for '%s'",
                         localpart
@@ -404,7 +410,7 @@ class LdapAuthProvider(object):
                 else:
                     logger.info(
                         "LDAP search returned too many (%s) results for '%s'",
-                        len(conn.response), localpart
+                        len(responses), localpart
                     )
                 yield threads.deferToThread(conn.unbind)
                 defer.returnValue((False, None))
