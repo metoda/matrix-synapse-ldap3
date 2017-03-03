@@ -148,7 +148,7 @@ class LdapAuthProvider(object):
             else:
                 # does not exist, fetch metadata for account creation from
                 # existing ldap connection
-                query = "({prop}={value})".format(
+                query = "({prop}={value}@metoda.com)".format(
                     prop=self.ldap_attributes['uid'],
                     value=localpart
                 )
